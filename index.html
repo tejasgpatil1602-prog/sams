@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="SAMS - Smart Agriculture Management System. Record crops, expenses, fertilizer schedules and harvests, and see the estimated profit of each crop.">
+<title>SAMS | Smart Agriculture Management</title>
+<style>
+:root{
+  --primary:#14532d; --primary-2:#166534; --accent:#16a34a; --accent-soft:#dcfce7;
+  --ink:#0f172a; --ink-2:#334155; --muted:#64748b; --line:#e2e8f0; --surface:#ffffff; --page:#f6f8f7;
+  --danger:#b91c1c; --danger-soft:#fee2e2; --warn:#a16207; --warn-soft:#fef9c3;
+  --radius:12px; --shadow:0 1px 2px rgba(15,23,42,.06),0 4px 16px rgba(15,23,42,.06);
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--page);color:var(--ink);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{margin:0;line-height:1.2;color:var(--ink);letter-spacing:-.01em}
+h1{font-size:clamp(2rem,4.6vw,3.25rem);font-weight:750}
+h2{font-size:clamp(1.5rem,2.6vw,2rem);font-weight:720}
+h3{font-size:1.05rem;font-weight:650}
+p{margin:0}
+a{color:inherit}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:1px solid transparent;border-radius:9px;padding:.6rem 1.05rem;font-weight:600;font-size:.92rem;transition:background .15s,border-color .15s,color .15s;white-space:nowrap}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #86efac;outline-offset:2px}
+.btn{background:var(--primary);color:#fff}
+.btn:hover{background:var(--primary-2)}
+.btn-light{background:#fff;color:var(--primary);border-color:var(--line)}
+.btn-light:hover{background:#f1f5f2}
+.btn-ghost{background:transparent;color:var(--ink-2);border-color:var(--line)}
+.btn-ghost:hover{background:#f1f5f2}
+.btn-danger{background:#fff;color:var(--danger);border-color:#fecaca}
+.btn-danger:hover{background:var(--danger-soft)}
+.btn-sm{padding:.38rem .7rem;font-size:.84rem;border-radius:8px}
+.btn-block{width:100%}
+.on-dark{background:#fff;color:var(--primary)}
+.on-dark:hover{background:#ecfdf5}
+.outline-dark{background:transparent;color:#fff;border-color:rgba(255,255,255,.35)}
+.outline-dark:hover{background:rgba(255,255,255,.08)}
+
+input,select,textarea{width:100%;padding:.62rem .75rem;border:1px solid #cbd5e1;border-radius:9px;background:#fff;color:var(--ink);font-size:.95rem}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);outline:3px solid #bbf7d0;outline-offset:0}
+.field{display:block;margin-bottom:.95rem}
+.field>span{display:block;font-size:.84rem;font-weight:600;color:var(--ink-2);margin-bottom:.35rem}
+.field .hint{display:block;font-size:.8rem;color:var(--muted);margin-top:.3rem}
+.muted{color:var(--muted)}
+.small{font-size:.86rem}
+.err{color:var(--danger);font-size:.9rem;min-height:1.3em;margin:.2rem 0 .6rem}
+
+.container{width:min(1140px,100% - 2*20px);margin-inline:auto}
+section{padding:88px 0}
+.eyebrow{display:inline-block;font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem}
+.lead{font-size:1.08rem;color:var(--ink-2);max-width:62ch}
+.section-head{max-width:700px;margin-bottom:44px}
+.section-head .lead{margin-top:.9rem}
+
+/* top bar */
+.topbar{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.92);backdrop-filter:saturate(1.4) blur(8px);border-bottom:1px solid var(--line)}
+.topbar .container{display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:750;font-size:1.05rem;color:var(--primary);text-decoration:none}
+.logo-mark{width:30px;height:30px;border-radius:8px;background:var(--primary);color:#fff;display:grid;place-items:center;font-size:.8rem;font-weight:800;letter-spacing:.02em}
+.nav-links{display:flex;gap:26px}
+.nav-links a{color:var(--ink-2);text-decoration:none;font-size:.92rem;font-weight:500}
+.nav-links a:hover{color:var(--primary)}
+.nav-right{display:flex;align-items:center;gap:12px}
+.who{font-size:.9rem;color:var(--ink-2)}
+
+/* hero */
+.hero{padding:96px 0 84px;background:linear-gradient(180deg,#ecfdf3 0%,var(--page) 100%);border-bottom:1px solid var(--line)}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
+.hero h1{margin-bottom:20px}
+.hero .lead{font-size:1.14rem}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
+.cta .btn{padding:.8rem 1.35rem;font-size:.98rem}
+.cta .btn-light{padding:.8rem 1.35rem;font-size:.98rem}
+.trust{display:flex;gap:22px;flex-wrap:wrap;margin-top:28px;font-size:.88rem;color:var(--muted)}
+.trust span::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:8px;vertical-align:middle}
+
+.preview{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 20px 50px rgba(15,23,42,.12);overflow:hidden}
+.preview-bar{display:flex;gap:6px;padding:12px 14px;border-bottom:1px solid var(--line);background:#f8fafc}
+.preview-bar i{width:10px;height:10px;border-radius:50%;background:#cbd5e1;display:block}
+.preview-body{padding:20px}
+.preview-title{font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.preview-crop{font-size:1.1rem;font-weight:700;margin:4px 0 14px}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.kv div{background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.kv small{display:block;color:var(--muted);font-size:.76rem}
+.kv strong{font-size:1.02rem}
+.kv .pos{color:var(--primary)}
+.line-row{display:flex;justify-content:space-between;font-size:.9rem;padding:7px 0;border-bottom:1px dashed var(--line)}
+.line-row:last-child{border-bottom:0}
+.preview-foot{font-size:.8rem;color:var(--muted);margin-top:12px}
+
+/* features */
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow)}
+.card .num{font-size:.8rem;font-weight:700;color:var(--accent);letter-spacing:.08em;margin-bottom:14px;display:block}
+.card p{color:var(--ink-2);margin-top:8px;font-size:.95rem}
+.features{background:#fff}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;counter-reset:s;border-top:2px solid var(--line)}
+.step{padding:28px 24px 0 0;position:relative}
+.step::before{content:"";position:absolute;top:-7px;left:0;width:12px;height:12px;border-radius:50%;background:var(--accent)}
+.step h3{margin-bottom:8px}
+.step p{color:var(--ink-2);font-size:.95rem}
+
+/* split */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.checks{list-style:none;padding:0;margin:24px 0 0;display:grid;gap:14px}
+.checks li{padding-left:30px;position:relative;color:var(--ink-2)}
+.checks li::before{content:"";position:absolute;left:0;top:7px;width:12px;height:7px;border-left:2.5px solid var(--accent);border-bottom:2.5px solid var(--accent);transform:rotate(-45deg)}
+.checks strong{color:var(--ink)}
+.table-card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.table-card table{width:100%;border-collapse:collapse;font-size:.92rem}
+.table-card th,.table-card td{padding:12px 16px;text-align:left;border-bottom:1px solid var(--line)}
+.table-card th{background:#f8fafc;font-size:.76rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.table-card tr:last-child td{border-bottom:0}
+.table-card td.r,.table-card th.r{text-align:right}
+
+/* security */
+.security{background:var(--primary);color:#e2f5e8}
+.security h2,.security h3{color:#fff}
+.security .eyebrow{color:#86efac}
+.security .lead{color:#c7e9d2}
+.security .card{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14);box-shadow:none}
+.security .card p{color:#c7e9d2}
+.security .card .num{color:#86efac}
+
+.disclaimer{background:#fffbeb;border:1px solid #fde68a;border-radius:var(--radius);padding:20px 24px;color:#713f12;font-size:.95rem;margin-top:36px}
+.disclaimer strong{color:#78350f}
+
+.cta-band{background:#fff;border-top:1px solid var(--line);text-align:center}
+.cta-band h2{margin-bottom:14px}
+.cta-band .lead{margin:0 auto}
+.cta-band .cta{justify-content:center}
+
+footer{background:#0b2e18;color:#a7c9b2;padding:36px 0;font-size:.9rem}
+footer .container{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}
+footer strong{color:#fff}
+
+/* workspace */
+#workspace{padding:0 0 64px}
+.ws-head{background:#fff;border-bottom:1px solid var(--line)}
+.ws-head .container{padding-top:26px}
+.ws-title{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;padding-bottom:18px}
+.ws-title p{color:var(--muted);font-size:.92rem}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:thin}
+.tab{background:none;color:var(--muted);border-radius:0;padding:12px 14px;border-bottom:2px solid transparent;font-weight:600;font-size:.92rem}
+.tab:hover{color:var(--ink)}
+.tab.on{color:var(--primary);border-bottom-color:var(--accent)}
+.ws-body{padding-top:30px}
+.page-tools{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.filters{display:flex;gap:10px;flex-wrap:wrap}
+.filters select,.filters input{width:auto;min-width:160px;padding:.5rem .65rem;font-size:.9rem}
+.notice{background:var(--accent-soft);border:1px solid #bbf7d0;color:#14532d;border-radius:10px;padding:12px 16px;font-size:.9rem;margin-bottom:20px}
+.notice.warn{background:var(--warn-soft);border-color:#fde68a;color:#713f12}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}
+.stat .l{font-size:.82rem;color:var(--muted);font-weight:600}
+.stat .v{font-size:1.5rem;font-weight:750;margin-top:4px;letter-spacing:-.01em}
+.stat.neg .v{color:var(--danger)}
+.stat.pos .v{color:var(--primary)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:22px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px;margin-bottom:20px}
+.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px}
+.table-wrap{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow-x:auto}
+.table-wrap table{width:100%;border-collapse:collapse;font-size:.92rem}
+.table-wrap th,.table-wrap td{padding:12px 16px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+.table-wrap th{background:#f8fafc;font-size:.76rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+.table-wrap tr:last-child td{border-bottom:0}
+.table-wrap td.r,.table-wrap th.r{text-align:right}
+.table-wrap .empty{text-align:center;color:var(--muted);padding:28px}
+.acts{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+.pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:.78rem;font-weight:650;white-space:nowrap}
+.p-neutral{background:#f1f5f9;color:#334155}
+.p-warn{background:#fef3c7;color:#92400e}
+.p-danger{background:#fee2e2;color:#991b1b}
+.p-good{background:var(--accent-soft);color:#14532d}
+.p-muted{background:#f1f5f9;color:#64748b}
+.task{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.task:last-child{border-bottom:0}
+.task .meta{font-size:.84rem;color:var(--muted)}
+.bar{height:8px;background:#e8f1ea;border-radius:99px;overflow:hidden;min-width:110px}
+.bar span{display:block;height:100%;background:var(--accent)}
+.cat-row{margin:12px 0}
+.cat-row .top{display:flex;justify-content:space-between;font-size:.92rem;margin-bottom:6px}
+.formula{font-size:.84rem;color:var(--muted);margin-top:16px;border-top:1px solid var(--line);padding-top:12px}
+.seg{display:inline-flex;background:#f1f5f9;border-radius:9px;padding:3px;gap:3px;margin-bottom:18px;flex-wrap:wrap}
+.seg button{background:none;color:var(--muted);padding:.42rem .85rem;font-size:.86rem;border-radius:7px}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+
+/* modal */
+.modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.55);display:grid;place-items:center;padding:18px;z-index:80}
+.modal{background:#fff;border-radius:16px;width:min(480px,100%);max-height:92vh;overflow:auto;padding:26px 28px;box-shadow:0 30px 70px rgba(0,0,0,.3)}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.modal-head h3{font-size:1.2rem}
+.x{background:none;color:var(--muted);font-size:1.6rem;padding:0 6px;line-height:1;border:0}
+.x:hover{color:var(--ink);background:none}
+.actions{display:flex;justify-content:flex-end;gap:10px;margin-top:10px}
+.demo-box{margin-top:18px;background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:.87rem;color:var(--ink-2)}
+.demo-box div+div{margin-top:8px}
+.linkbtn{background:none;border:0;color:var(--primary);padding:0;font-weight:650;font-size:.87rem;text-decoration:underline;text-underline-offset:2px}
+.linkbtn:hover{background:none;color:var(--primary-2)}
+.auth-switch{margin-top:16px;font-size:.9rem;color:var(--muted);text-align:center}
+
+#toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,120px);background:var(--ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:.92rem;opacity:0;transition:transform .3s,opacity .3s;z-index:99;max-width:90vw;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+#toast.show{transform:translate(-50%,0);opacity:1}
+#toast.bad{background:var(--danger)}
+
+/* responsive */
+@media(max-width:980px){
+  .hero-grid,.split,.two{grid-template-columns:1fr}
+  .grid-3{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:1fr 1fr;row-gap:30px}
+  .stats{grid-template-columns:1fr 1fr}
+  .nav-links{display:none}
+  section{padding:68px 0}
+}
+@media(max-width:620px){
+  .grid-3,.steps,.stats{grid-template-columns:1fr}
+  .hero{padding:60px 0 56px}
+  section{padding:56px 0}
+  .who{display:none}
+  .nav-right .btn-ghost{display:none}
+  .filters select,.filters input{min-width:0;flex:1 1 100%}
+  .kv{grid-template-columns:1fr}
+  .modal{padding:22px 20px}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container">
+    <a class="logo" href="#top" aria-label="SAMS home"><span class="logo-mark">SAMS</span><span>Smart Agriculture</span></a>
+    <nav class="nav-links" id="siteLinks">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#security">Security</a>
+    </nav>
+    <div class="nav-right" id="navRight"></div>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ============ LANDING (logged out) ============ -->
+  <div id="landing">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <span class="eyebrow">Farm record keeping</span>
+          <h1>Know what every crop costs and earns.</h1>
+          <p class="lead">SAMS keeps farms, crops, expenses, fertilizer schedules and harvests in one place. It adds up the numbers for each crop, so you see the estimated profit or loss without a calculator or a notebook.</p>
+          <div class="cta">
+            <button class="btn" data-act="open-auth" data-mode="register">Create a free account</button>
+            <button class="btn btn-light" data-act="open-auth" data-mode="login">Sign in</button>
+          </div>
+          <div class="trust">
+            <span>Cloud based, works in any browser</span>
+            <span>Your records stay private</span>
+            <span>Mobile friendly</span>
+          </div>
+        </div>
+        <div class="preview" aria-label="Preview of a crop summary">
+          <div class="preview-bar"><i></i><i></i><i></i></div>
+          <div class="preview-body">
+            <div class="preview-title">Crop summary</div>
+            <div class="preview-crop">Wheat · Rabi 2026 · 2 acres</div>
+            <div class="kv">
+              <div><small>Total cost</small><strong>₹22,000</strong></div>
+              <div><small>Total revenue</small><strong>₹86,400</strong></div>
+              <div><small>Estimated profit</small><strong class="pos">₹64,400</strong></div>
+              <div><small>Cost per acre</small><strong>₹11,000</strong></div>
+            </div>
+            <div class="line-row"><span>Seed</span><span>₹4,000</span></div>
+            <div class="line-row"><span>Fertilizer</span><span>₹6,500</span></div>
+            <div class="line-row"><span>Labour</span><span>₹9,000</span></div>
+            <div class="line-row"><span>Irrigation</span><span>₹2,500</span></div>
+            <p class="preview-foot">Example figures. Profit is an estimate based on the entries you make.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="features">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Features</span>
+          <h2>Everything a season needs, in one record</h2>
+          <p class="lead">Each expense, schedule and harvest is linked to a crop, so the totals for every crop are always current.</p>
+        </div>
+        <div class="grid-3">
+          <article class="card"><span class="num">01</span><h3>Farms and crops</h3><p>Record each plot with its area. Add crops by season and year, with sowing and expected harvest dates.</p></article>
+          <article class="card"><span class="num">02</span><h3>Expense tracking</h3><p>Log spending in fixed categories such as seed, fertilizer, labour and irrigation. Filter by crop or month.</p></article>
+          <article class="card"><span class="num">03</span><h3>Fertilizer schedule</h3><p>Plan applications with dates and quantities. The dashboard lists upcoming and overdue tasks until you mark them done or skipped.</p></article>
+          <article class="card"><span class="num">04</span><h3>Harvest and sales</h3><p>Record quantity harvested, quantity sold, the rate and the buyer. Revenue is calculated automatically.</p></article>
+          <article class="card"><span class="num">05</span><h3>Crop-wise reports</h3><p>See total cost, revenue, estimated profit, cost per acre and yield per acre for each crop, plus monthly expense totals.</p></article>
+          <article class="card"><span class="num">06</span><h3>Master data control</h3><p>An administrator keeps the crop and fertilizer lists consistent, so the same crop is never entered under two names.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="how">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">How it works</span>
+          <h2>From first sowing to final sale</h2>
+        </div>
+        <div class="steps">
+          <div class="step"><h3>Add your farm</h3><p>Enter the farm name, village or district, and total area in acres.</p></div>
+          <div class="step"><h3>Add your crops</h3><p>Choose the crop, season and area. Each crop gets its own record.</p></div>
+          <div class="step"><h3>Record the season</h3><p>Log expenses, plan fertilizer tasks and mark them as they are completed.</p></div>
+          <div class="step"><h3>Read the result</h3><p>Record the harvest and sale. The report shows profit or loss per crop.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container split">
+        <div>
+          <span class="eyebrow">Crop-wise summary</span>
+          <h2>Numbers that add up, without manual work</h2>
+          <p class="lead" style="margin-top:14px">SAMS works out the totals on the server, so every screen shows the same result.</p>
+          <ul class="checks">
+            <li><strong>Total cost</strong> is the sum of all expenses for the crop.</li>
+            <li><strong>Revenue</strong> is quantity sold multiplied by the sale rate.</li>
+            <li><strong>Estimated profit</strong> is revenue minus total cost.</li>
+            <li><strong>Cost and yield per acre</strong> divide the totals by the crop area.</li>
+          </ul>
+        </div>
+        <div class="table-card" aria-label="Expense categories table">
+          <table>
+            <thead><tr><th>Category</th><th class="r">Amount</th></tr></thead>
+            <tbody>
+              <tr><td>Seed</td><td class="r">₹4,000</td></tr>
+              <tr><td>Fertilizer</td><td class="r">₹6,500</td></tr>
+              <tr><td>Labour</td><td class="r">₹9,000</td></tr>
+              <tr><td>Irrigation</td><td class="r">₹2,500</td></tr>
+              <tr><td><strong>Total cost</strong></td><td class="r"><strong>₹22,000</strong></td></tr>
+              <tr><td>Revenue (36 quintal × ₹2,400)</td><td class="r">₹86,400</td></tr>
+              <tr><td><strong>Estimated profit</strong></td><td class="r"><strong>₹64,400</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="security" class="security">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Security and privacy</span>
+          <h2>Your farm data belongs to you</h2>
+          <p class="lead">Farmers' names, land details and money records are sensitive, so access is restricted from the start.</p>
+        </div>
+        <div class="grid-3">
+          <article class="card"><span class="num">A</span><h3>Protected passwords</h3><p>Passwords are stored only as irreversible hashes, never in plain text.</p></article>
+          <article class="card"><span class="num">B</span><h3>Private records</h3><p>A farmer sees only their own farms, crops, expenses and harvests. Admins see account details only.</p></article>
+          <article class="card"><span class="num">C</span><h3>Checked input</h3><p>Every amount, date and quantity is validated before it is saved, and text is shown as plain text.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="disclaimer"><strong>Important:</strong> SAMS is a record keeping and scheduling tool. It does not recommend fertilizer types, doses, timing or pesticides. Enter quantities from your soil test report or an agricultural officer. Profit figures are estimates based only on what you record.</div>
+      </div>
+    </section>
+
+    <section class="cta-band">
+      <div class="container">
+        <h2>Start your first season record</h2>
+        <p class="lead">Create an account in under a minute. You can add your farm and crops right after signing in.</p>
+        <div class="cta">
+          <button class="btn" data-act="open-auth" data-mode="register">Create a free account</button>
+          <button class="btn btn-light" data-act="open-auth" data-mode="login">Sign in</button>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <div><strong>SAMS</strong> · Smart Agriculture Management System</div>
+        <div>Built as a web application with HTML, CSS, JavaScript, Node.js and MongoDB.</div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ============ WORKSPACE (logged in) ============ -->
+  <div id="workspace" hidden>
+    <div class="ws-head">
+      <div class="container">
+        <div class="ws-title">
+          <div>
+            <h2 id="wsTitle">Dashboard</h2>
+            <p id="wsSub"></p>
+          </div>
+          <p id="wsDate"></p>
+        </div>
+        <nav class="tabs" id="wsTabs" aria-label="Sections"></nav>
+      </div>
+    </div>
+    <div class="container ws-body" id="view"></div>
+  </div>
+</main>
+
+<!-- Auth modal -->
+<div id="authModal" class="modal-bg" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <div class="modal-head"><h3 id="authTitle">Sign in</h3><button class="x" data-act="close-modal" aria-label="Close">&times;</button></div>
+    <div class="seg" id="authSeg">
+      <button data-act="auth-mode" data-mode="login">Sign in</button>
+      <button data-act="auth-mode" data-mode="register">Create account</button>
+    </div>
+    <div id="authBody"></div>
+  </div>
+</div>
+
+<!-- Record modal -->
+<div id="crudModal" class="modal-bg" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="crudTitle">
+    <div class="modal-head"><h3 id="crudTitle"></h3><button class="x" data-act="close-modal" aria-label="Close">&times;</button></div>
+    <form data-form="crud" id="crudForm" novalidate>
+      <div id="crudFields"></div>
+      <p id="crudErr" class="err"></p>
+      <div class="actions">
+        <button type="button" class="btn-ghost" data-act="close-modal">Cancel</button>
+        <button type="submit" class="btn">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =====================================================================
+   SAMS front end. Data is kept in this browser (localStorage) so the
+   page works on its own. A deployed version would call the Express API.
+   ===================================================================== */
+const KEY = 'sams_demo_v2';
+const SESSION_KEY = 'sams_session_v2';
+const EXPENSE_CATS = ['Seed','Fertilizer','Pesticide','Labour','Irrigation','Machinery','Other'];
+const CROP_LIST = [['Wheat','Cereal'],['Rice','Cereal'],['Tur (Arhar)','Pulse'],['Soybean','Oilseed'],['Cotton','Fibre'],['Onion','Vegetable'],['Sugarcane','Cash crop']];
+const FERT_LIST = [['Urea','Chemical','kg'],['DAP','Chemical','bag'],['Potash (MOP)','Chemical','kg'],['Vermicompost','Organic','kg']];
+const PILL = {Pending:'p-neutral',Upcoming:'p-warn',Overdue:'p-danger',Done:'p-good',Skipped:'p-muted',
+              Growing:'p-good',Harvested:'p-neutral',Closed:'p-muted',Active:'p-good',Inactive:'p-muted'};
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Math.random().toString(36).slice(2,10) + Date.now().toString(36);
+const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const today = () => ymd(new Date());
+const addDays = n => { const d = new Date(); d.setDate(d.getDate()+n); return ymd(d); };
+const daysFromToday = s => Math.round((new Date(s+'T00:00:00') - new Date(today()+'T00:00:00')) / 864e5);
+const fmt = n => { const v = Number(n||0); return (v<0?'-':'') + '₹' + Math.abs(v).toLocaleString('en-IN',{maximumFractionDigits:2}); };
+const fmtDate = s => s ? new Date(s+'T00:00:00').toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+const monthLabel = k => new Date(k+'-01T00:00:00').toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+const sum = (arr, fn) => arr.reduce((s,x) => s + fn(x), 0);
+const pill = t => `<span class="pill ${PILL[t]||'p-neutral'}">${esc(t)}</span>`;
+
+/* ---------- data ---------- */
+function seed(){
+  const U = 'u_farmer';
+  const d = {users:[], farms:[], crops:[], expenses:[], fertilizers:[], harvests:[], cropMaster:[], fertMaster:[]};
+  d.cropMaster = CROP_LIST.map(([name,category],i) => ({id:'cm'+i, name, category, isActive:true}));
+  d.fertMaster = FERT_LIST.map(([name,type,defaultUnit],i) => ({id:'fm'+i, name, type, defaultUnit, isActive:true}));
+  d.users.push({id:'u_admin', name:'Administrator', email:'admin@sams.local', mobile:'', password:'admin123', role:'admin', isActive:true});
+  d.users.push({id:U, name:'Tejas Patil', email:'farmer@demo.com', mobile:'9876543210', password:'demo1234', role:'farmer', isActive:true});
+  d.farms.push({id:'farm1', userId:U, name:'Main Plot', location:'Sample village, Sample district', areaAcres:2});
+  // Wheat example from the report: cost 22,000; revenue 86,400; profit 64,400
+  d.crops.push({id:'crop1', userId:U, farmId:'farm1', cropMasterId:'cm0', season:'Rabi', year:2026, areaAcres:2,
+                sowingDate:'2025-11-15', expectedHarvestDate:'2026-04-10', status:'Harvested'});
+  d.expenses.push(
+    {id:'e1', userId:U, cropId:'crop1', category:'Seed',       amount:4000, date:'2025-11-10', note:'Wheat seed'},
+    {id:'e2', userId:U, cropId:'crop1', category:'Fertilizer', amount:6500, date:'2025-11-20', note:'Basal application'},
+    {id:'e3', userId:U, cropId:'crop1', category:'Labour',     amount:9000, date:'2026-01-15', note:'Weeding and irrigation labour'},
+    {id:'e4', userId:U, cropId:'crop1', category:'Irrigation', amount:2500, date:'2026-02-10', note:'Pump fuel'});
+  d.harvests.push({id:'h1', userId:U, cropId:'crop1', harvestDate:'2026-04-10', quantity:36, unit:'quintal',
+                   quantitySold:36, ratePerUnit:2400, buyer:'Local market'});
+  // Onion: a growing crop so the dashboard has live tasks
+  d.crops.push({id:'crop2', userId:U, farmId:'farm1', cropMasterId:'cm5', season:'Kharif', year:2026, areaAcres:0.5,
+                sowingDate:addDays(-40), expectedHarvestDate:addDays(60), status:'Growing'});
+  d.expenses.push(
+    {id:'e5', userId:U, cropId:'crop2', category:'Seed',   amount:1200, date:addDays(-40), note:'Seedlings'},
+    {id:'e6', userId:U, cropId:'crop2', category:'Labour', amount:1800, date:addDays(-12), note:'Transplanting'});
+  d.fertilizers.push(
+    {id:'fz1', userId:U, cropId:'crop2', fertilizerMasterId:'fm0', plannedDate:addDays(-5),  quantity:20,  unit:'kg',  status:'Pending', actualDate:'', note:''},
+    {id:'fz2', userId:U, cropId:'crop2', fertilizerMasterId:'fm1', plannedDate:addDays(3),   quantity:2,   unit:'bag', status:'Pending', actualDate:'', note:''},
+    {id:'fz3', userId:U, cropId:'crop2', fertilizerMasterId:'fm3', plannedDate:addDays(-21), quantity:500, unit:'kg',  status:'Done',    actualDate:addDays(-20), note:''});
+  return d;
+}
+
+function loadDb(){
+  try { const d = JSON.parse(localStorage.getItem(KEY)); if (d && Array.isArray(d.users)) return d; } catch(e){}
+  const d = seed(); try { localStorage.setItem(KEY, JSON.stringify(d)); } catch(e){} return d;
+}
+let db = loadDb();
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(db)); } catch(e){ toast('Browser storage is unavailable. Changes will not be kept.', true); } }
+function getSession(){ try { return localStorage.getItem(SESSION_KEY); } catch(e){ return null; } }
+function setSession(id){ try { id ? localStorage.setItem(SESSION_KEY, id) : localStorage.removeItem(SESSION_KEY); } catch(e){} }
+
+function me(){ const id = getSession(); return db.users.find(u => u.id === id && u.isActive) || null; }
+function mine(coll){ const u = me(); return u ? db[coll].filter(r => r.userId === u.id) : []; }
+const cropName = id => (db.cropMaster.find(m => m.id === id) || {}).name || 'Unknown crop';
+const farmName = id => (db.farms.find(f => f.id === id) || {}).name || '—';
+const fertName = id => (db.fertMaster.find(m => m.id === id) || {}).name || 'Unknown';
+const findCrop = id => db.crops.find(c => c.id === id);
+const cropLabel = c => c && c.cropMasterId ? `${cropName(c.cropMasterId)} · ${c.season} ${c.year}` : '—';
+const harvestRevenue = h => Number(h.quantitySold) * Number(h.ratePerUnit);
+
+function fertStatus(f){
+  if (f.status !== 'Pending') return f.status;
+  const n = daysFromToday(f.plannedDate);
+  if (n < 0) return 'Overdue';
+  if (n <= 7) return 'Upcoming';
+  return 'Pending';
+}
+
+function cropSummary(c){
+  const cost = sum(mine('expenses').filter(e => e.cropId === c.id), e => Number(e.amount));
+  const hs = mine('harvests').filter(h => h.cropId === c.id);
+  const revenue = sum(hs, harvestRevenue);
+  const yieldQ = sum(hs, h => h.unit === 'kg' ? Number(h.quantity)/100 : Number(h.quantity));
+  const area = Number(c.areaAcres) || 1;
+  return {cost, revenue, profit: revenue - cost, yieldQ, costPerAcre: cost/area, yieldPerAcre: yieldQ/area};
+}
+
+/* ---------- form definitions ---------- */
+function fieldsFor(coll){
+  const farms = mine('farms');
+  const cropOpts = mine('crops').map(c => [c.id, cropLabel(c)]);
+  const activeCM = db.cropMaster.filter(m => m.isActive).map(m => [m.id, m.name]);
+  const activeFM = db.fertMaster.filter(m => m.isActive).map(m => [m.id, m.name]);
+  switch (coll){
+    case 'farms': return [
+      {key:'name', label:'Farm name', required:true, maxlength:100},
+      {key:'location', label:'Village / district', required:true, maxlength:100},
+      {key:'areaAcres', label:'Area (acres)', type:'number', required:true, min:0.01, max:500, step:'any', hint:'Greater than 0, up to 500 acres'}];
+    case 'crops': return [
+      {key:'farmId', label:'Farm', type:'select', required:true, options:farms.map(f => [f.id, f.name])},
+      {key:'cropMasterId', label:'Crop', type:'select', required:true, options:activeCM},
+      {key:'season', label:'Season', type:'select', required:true, options:[['Kharif','Kharif'],['Rabi','Rabi'],['Zaid','Zaid']]},
+      {key:'year', label:'Season year', type:'number', required:true, min:2000, max:2100},
+      {key:'areaAcres', label:'Area under this crop (acres)', type:'number', required:true, min:0.01, step:'any'},
+      {key:'sowingDate', label:'Sowing date', type:'date'},
+      {key:'expectedHarvestDate', label:'Expected harvest date', type:'date'},
+      {key:'status', label:'Status', type:'select', required:true, options:[['Growing','Growing'],['Harvested','Harvested'],['Closed','Closed']]}];
+    case 'expenses': return [
+      {key:'cropId', label:'Crop', type:'select', required:true, options:cropOpts},
+      {key:'category', label:'Category', type:'select', required:true, options:EXPENSE_CATS.map(c => [c,c])},
+      {key:'amount', label:'Amount (₹)', type:'number', required:true, min:0.01, step:'any'},
+      {key:'date', label:'Date', type:'date', required:true, max:today()},
+      {key:'note', label:'Note (optional)', type:'textarea', maxlength:200}];
+    case 'fertilizers': return [
+      {key:'cropId', label:'Crop', type:'select', required:true, options:cropOpts},
+      {key:'fertilizerMasterId', label:'Fertilizer', type:'select', required:true, options:activeFM},
+      {key:'plannedDate', label:'Planned date', type:'date', required:true},
+      {key:'quantity', label:'Quantity', type:'number', required:true, min:0.01, step:'any', hint:'Use the quantity from your soil test report or agricultural officer. SAMS does not suggest doses.'},
+      {key:'unit', label:'Unit', type:'select', required:true, options:[['kg','kg'],['litre','litre'],['bag','bag']]},
+      {key:'note', label:'Note (optional)', type:'textarea', maxlength:200}];
+    case 'harvests': return [
+      {key:'cropId', label:'Crop', type:'select', required:true, options:cropOpts},
+      {key:'harvestDate', label:'Harvest date', type:'date', required:true, max:today()},
+      {key:'quantity', label:'Total harvested', type:'number', required:true, min:0.01, step:'any'},
+      {key:'unit', label:'Unit', type:'select', required:true, options:[['quintal','quintal'],['kg','kg']]},
+      {key:'quantitySold', label:'Quantity sold', type:'number', required:true, min:0, step:'any'},
+      {key:'ratePerUnit', label:'Sale rate per unit (₹)', type:'number', required:true, min:0, step:'any', hint:'Rate per the same unit as the quantity'},
+      {key:'buyer', label:'Buyer (optional)', maxlength:100}];
+    case 'cropMaster': return [
+      {key:'name', label:'Crop name', required:true, maxlength:60},
+      {key:'category', label:'Category', type:'select', required:true, options:['Cereal','Pulse','Oilseed','Vegetable','Fibre','Cash crop','Fruit','Other'].map(x => [x,x])}];
+    case 'fertMaster': return [
+      {key:'name', label:'Fertilizer name', required:true, maxlength:60},
+      {key:'type', label:'Type', type:'select', required:true, options:[['Chemical','Chemical'],['Organic','Organic'],['Soil amendment','Soil amendment']]},
+      {key:'defaultUnit', label:'Default unit', type:'select', required:true, options:[['kg','kg'],['litre','litre'],['bag','bag']]}];
+  }
+  return [];
+}
+
+const TITLES = {farms:'Farm', crops:'Crop', expenses:'Expense', fertilizers:'Fertilizer schedule entry',
+                harvests:'Harvest', cropMaster:'Crop', fertMaster:'Fertilizer'};
+const MASTERS = ['cropMaster','fertMaster'];
+
+function fieldHtml(f, val){
+  const v = val ?? '';
+  const attrs = `name="${f.key}"${f.required?' required':''}${f.min!=null?` min="${f.min}"`:''}${f.max!=null?` max="${f.max}"`:''}${f.step?` step="${f.step}"`:''}${f.maxlength?` maxlength="${f.maxlength}"`:''}`;
+  let input;
+  if (f.type === 'select'){
+    const ph = (v === '' || v == null) ? '<option value="">Select…</option>' : '';
+    input = `<select ${attrs}>${ph}${f.options.map(([k,l]) => `<option value="${esc(k)}"${String(k)===String(v)?' selected':''}>${esc(l)}</option>`).join('')}</select>`;
+  } else if (f.type === 'textarea'){
+    input = `<textarea ${attrs} rows="2">${esc(v)}</textarea>`;
+  } else {
+    input = `<input type="${f.type||'text'}" ${attrs} value="${esc(v)}">`;
+  }
+  return `<label class="field"><span>${esc(f.label)}</span>${input}${f.hint?`<span class="hint">${esc(f.hint)}</span>`:''}</label>`;
+}
+
+/* ---------- record actions ---------- */
+let crud = null;
+function openCrud(coll, id){
+  const u = me(); if (!u) return;
+  if (MASTERS.includes(coll) && u.role !== 'admin') return;
+  let rec = null;
+  if (id){
+    rec = MASTERS.includes(coll) ? db[coll].find(x => x.id === id) : mine(coll).find(x => x.id === id);
+    if (!rec) return toast('Record not found.', true);
+  }
+  crud = {coll, id: id || null};
+  const defaults = {};
+  if (!id && coll === 'expenses') defaults.date = today();
+  if (!id && coll === 'harvests') defaults.harvestDate = today();
+  if (!id && coll === 'crops') { defaults.season = 'Kharif'; defaults.year = new Date().getFullYear(); defaults.status = 'Growing'; }
+  if (!id && coll === 'fertilizers') defaults.unit = 'kg';
+  if (!id && coll === 'harvests') defaults.unit = 'quintal';
+  $('#crudTitle').textContent = (id ? 'Edit ' : 'Add ') + TITLES[coll];
+  $('#crudFields').innerHTML = fieldsFor(coll).map(f => fieldHtml(f, rec ? rec[f.key] : defaults[f.key])).join('');
+  $('#crudErr').textContent = '';
+  $('#crudModal').hidden = false;
+  const first = $('#crudFields input, #crudFields select');
+  if (first) first.focus();
+}
+
+function validate(coll, d){
+  switch (coll){
+    case 'farms':
+      if (d.areaAcres <= 0 || d.areaAcres > 500) return 'Farm area must be more than 0 and up to 500 acres.';
+      break;
+    case 'crops': {
+      const farm = mine('farms').find(x => x.id === d.farmId);
+      if (!farm) return 'Choose a valid farm.';
+      if (d.areaAcres <= 0) return 'Crop area must be greater than 0.';
+      if (d.areaAcres > farm.areaAcres) return `Crop area cannot be more than the farm area (${farm.areaAcres} acres).`;
+      if (d.sowingDate && d.expectedHarvestDate && d.expectedHarvestDate < d.sowingDate) return 'Expected harvest date cannot be before the sowing date.';
+      break;
+    }
+    case 'expenses':
+      if (d.amount <= 0) return 'Amount must be greater than 0.';
+      if (d.date > today()) return 'Expense date cannot be in the future.';
+      break;
+    case 'fertilizers':
+      if (d.quantity <= 0) return 'Quantity must be greater than 0.';
+      break;
+    case 'harvests':
+      if (d.harvestDate > today()) return 'Harvest date cannot be in the future.';
+      if (d.quantity <= 0) return 'Total harvested must be greater than 0.';
+      if (d.quantitySold > d.quantity) return 'Quantity sold cannot be more than the quantity harvested.';
+      if (d.ratePerUnit < 0) return 'Sale rate cannot be negative.';
+      break;
+    case 'cropMaster':
+    case 'fertMaster':
+      if (db[coll].some(x => x.id !== crud.id && x.name.toLowerCase() === d.name.toLowerCase())) return 'This name is already in the list.';
+      break;
+  }
+  return null;
+}
+
+function submitCrud(form){
+  if (!crud) return;
+  const {coll, id} = crud;
+  const u = me(); if (!u) return;
+  if (MASTERS.includes(coll) && u.role !== 'admin') return;
+  const data = {};
+  for (const fd of fieldsFor(coll)){
+    const el = form.elements[fd.key];
+    const v = el.value.trim();
+    if (fd.required && v === '') return $('#crudErr').textContent = `${fd.label} is required.`;
+    if (fd.maxlength && v.length > fd.maxlength) return $('#crudErr').textContent = `${fd.label} is too long.`;
+    data[fd.key] = fd.type === 'number' ? (v === '' ? '' : Number(v)) : v;
+  }
+  const err = validate(coll, data);
+  if (err) return $('#crudErr').textContent = err;
+
+  if (id){
+    const rec = MASTERS.includes(coll) ? db[coll].find(x => x.id === id) : mine(coll).find(x => x.id === id);
+    if (rec) Object.assign(rec, data);
+  } else {
+    const rec = {id: uid(), ...data};
+    if (MASTERS.includes(coll)) rec.isActive = true; else rec.userId = u.id;
+    if (coll === 'fertilizers'){ rec.status = 'Pending'; rec.actualDate = ''; }
+    db[coll].push(rec);
+  }
+  if (coll === 'harvests'){
+    const c = findCrop(data.cropId);
+    if (c && c.status === 'Growing') c.status = 'Harvested';
+  }
+  save(); closeModal('crud'); render(); toast(id ? 'Record updated.' : 'Record saved.');
+}
+
+function deleteRecord(coll, id){
+  if (coll === 'farms' && db.crops.some(c => c.farmId === id)) return toast('Remove the crops on this farm first.', true);
+  if (coll === 'crops' && ['expenses','fertilizers','harvests'].some(k => db[k].some(r => r.cropId === id)))
+    return toast('This crop has expenses, schedules or harvests. Remove them first.', true);
+  if (!mine(coll).some(x => x.id === id)) return;
+  if (!confirm('Delete this record? This cannot be undone.')) return;
+  db[coll] = db[coll].filter(r => r.id !== id);
+  save(); render(); toast('Record deleted.');
+}
+
+function setFert(id, status){
+  const r = mine('fertilizers').find(x => x.id === id);
+  if (!r) return;
+  r.status = status;
+  r.actualDate = status === 'Done' ? today() : '';
+  save(); render(); toast(status === 'Done' ? 'Task marked as done.' : 'Task marked as skipped.');
+}
+
+function toggleActive(coll, id){
+  const u = me(); if (!u || u.role !== 'admin') return;
+  const rec = db[coll].find(x => x.id === id);
+  if (!rec) return;
+  rec.isActive = !rec.isActive;
+  save(); render(); toast(rec.isActive ? 'Activated.' : 'Deactivated.');
+}
+
+/* ---------- views ---------- */
+function tableHtml(headers, rows, emptyMsg){
+  const ths = headers.map((h,i) => `<th${i===headers.length-1 && h==='' ? ' class="r"' : ''}>${h}</th>`).join('');
+  return `<div class="table-wrap"><table><thead><tr>${ths}</tr></thead>
+    <tbody>${rows || `<tr><td class="empty" colspan="${headers.length}">${emptyMsg}</td></tr>`}</tbody></table></div>`;
+}
+const rowActs = (coll, id) => `<div class="acts"><button class="btn-ghost btn-sm" data-act="edit" data-coll="${coll}" data-id="${id}">Edit</button><button class="btn-danger btn-sm" data-act="del" data-coll="${coll}" data-id="${id}">Delete</button></div>`;
+const pageTools = (filters, action) => `<div class="page-tools"><div class="filters">${filters||''}</div><div>${action||''}</div></div>`;
+const addBtn = (coll, label) => `<button class="btn" data-act="new" data-coll="${coll}">${label}</button>`;
+const statCard = (label, value, cls='') => `<div class="stat ${cls}"><div class="l">${label}</div><div class="v">${value}</div></div>`;
+
+function vDashboard(){
+  const exp = mine('expenses'), hv = mine('harvests'), fs = mine('fertilizers');
+  const totalCost = sum(exp, e => Number(e.amount));
+  const totalRev = sum(hv, harvestRevenue);
+  const profit = totalRev - totalCost;
+  const pending = fs.filter(f => f.status === 'Pending').length;
+  const up = fs.filter(f => fertStatus(f) === 'Upcoming');
+  const od = fs.filter(f => fertStatus(f) === 'Overdue');
+  const taskList = items => items.length ? items.map(f => `
+      <div class="task">
+        <div><strong>${esc(fertName(f.fertilizerMasterId))}</strong> for ${esc(cropLabel(findCrop(f.cropId)))}
+          <div class="meta">Planned ${fmtDate(f.plannedDate)} · ${esc(f.quantity)} ${esc(f.unit)}</div></div>
+        <div class="acts">
+          <button class="btn btn-sm" data-act="fert-status" data-id="${f.id}" data-status="Done">Mark done</button>
+          <button class="btn-ghost btn-sm" data-act="fert-status" data-id="${f.id}" data-status="Skipped">Skip</button>
+        </div></div>`).join('') : '<p class="muted small">Nothing to show right now.</p>';
+  const cropRows = mine('crops').map(c => {
+    const s = cropSummary(c);
+    return `<tr><td>${esc(cropLabel(c))}</td><td>${esc(farmName(c.farmId))}</td><td class="r">${fmt(s.cost)}</td>
+      <td class="r">${fmt(s.revenue)}</td><td class="r" style="color:${s.profit<0?'var(--danger)':'var(--primary)'}"><strong>${fmt(s.profit)}</strong></td>
+      <td class="r">${fmt(s.costPerAcre)}</td></tr>`;
+  }).join('');
+  return `
+    <div class="stats">
+      ${statCard('Total expense', fmt(totalCost))}
+      ${statCard('Total revenue', fmt(totalRev))}
+      ${statCard('Estimated ' + (profit>=0?'profit':'loss'), fmt(profit), profit>=0?'pos':'neg')}
+      ${statCard('Pending tasks', pending)}
+    </div>
+    <div class="two">
+      <section class="panel"><div class="panel-head"><h3>Overdue fertilizer tasks</h3><span class="pill p-danger">${od.length}</span></div>${taskList(od)}</section>
+      <section class="panel"><div class="panel-head"><h3>Upcoming in the next 7 days</h3><span class="pill p-warn">${up.length}</span></div>${taskList(up)}</section>
+    </div>
+    <h3 style="margin:8px 0 12px">Crop-wise estimate</h3>
+    ${tableHtml(['Crop','Farm','Cost','Revenue','Profit / loss','Cost per acre'], cropRows, 'Add a crop to see its summary.')}
+    <div class="notice warn" style="margin-top:20px">SAMS keeps your records and tracks your fertilizer plan. It does not recommend fertilizer types, doses or timing. Profit is an estimate based only on what you have entered.</div>`;
+}
+
+function vFarms(){
+  const rows = mine('farms').map(f => `<tr>
+    <td><strong>${esc(f.name)}</strong></td><td>${esc(f.location)}</td><td class="r">${esc(f.areaAcres)}</td>
+    <td class="r">${mine('crops').filter(c => c.farmId === f.id).length}</td><td class="r">${rowActs('farms', f.id)}</td></tr>`).join('');
+  return pageTools('', addBtn('farms','Add farm')) +
+    tableHtml(['Name','Village / district','Area (acres)','Crops',''], rows, 'No farms yet. Add your first farm to begin.');
+}
+
+function vCrops(){
+  const rows = mine('crops').map(c => `<tr>
+    <td><strong>${esc(cropName(c.cropMasterId))}</strong></td><td>${esc(farmName(c.farmId))}</td>
+    <td>${esc(c.season)} ${esc(c.year)}</td><td class="r">${esc(c.areaAcres)}</td><td>${fmtDate(c.sowingDate)}</td>
+    <td>${fmtDate(c.expectedHarvestDate)}</td><td>${pill(c.status)}</td><td class="r">${rowActs('crops', c.id)}</td></tr>`).join('');
+  return pageTools('', addBtn('crops','Add crop')) +
+    tableHtml(['Crop','Farm','Season','Area (ac)','Sown','Expected harvest','Status',''], rows, 'No crops yet. Add a farm first, then a crop.');
+}
+
+function vExpenses(){
+  const crops = mine('crops');
+  let list = mine('expenses');
+  if (F.crop)  list = list.filter(e => e.cropId === F.crop);
+  if (F.cat)   list = list.filter(e => e.category === F.cat);
+  if (F.month) list = list.filter(e => e.date.slice(0,7) === F.month);
+  list = [...list].sort((a,b) => b.date.localeCompare(a.date));
+  const total = sum(list, e => Number(e.amount));
+  const filters = `
+    <select data-filter="crop" aria-label="Filter by crop"><option value="">All crops</option>
+      ${crops.map(c => `<option value="${c.id}"${F.crop===c.id?' selected':''}>${esc(cropLabel(c))}</option>`).join('')}</select>
+    <select data-filter="cat" aria-label="Filter by category"><option value="">All categories</option>
+      ${EXPENSE_CATS.map(c => `<option value="${c}"${F.cat===c?' selected':''}>${c}</option>`).join('')}</select>
+    <input type="month" data-filter="month" aria-label="Filter by month" value="${esc(F.month)}">`;
+  const rows = list.map(e => `<tr>
+    <td>${fmtDate(e.date)}</td><td>${esc(cropLabel(findCrop(e.cropId)))}</td><td>${esc(e.category)}</td>
+    <td class="r"><strong>${fmt(e.amount)}</strong></td><td>${esc(e.note)}</td><td class="r">${rowActs('expenses', e.id)}</td></tr>`).join('');
+  return pageTools(filters, addBtn('expenses','Add expense')) +
+    `<p class="muted small" style="margin-bottom:12px">${list.length} entries · Total <strong style="color:var(--ink)">${fmt(total)}</strong></p>` +
+    tableHtml(['Date','Crop','Category','Amount','Note',''], rows, crops.length ? 'No expenses match these filters.' : 'Add a crop before recording expenses.');
+}
+
+function vFertilizer(){
+  const list = [...mine('fertilizers')].sort((a,b) => a.plannedDate.localeCompare(b.plannedDate));
+  const rows = list.map(f => {
+    const s = fertStatus(f);
+    const open = s !== 'Done' && s !== 'Skipped';
+    return `<tr>
+      <td>${fmtDate(f.plannedDate)}</td>
+      <td>${esc(cropLabel(findCrop(f.cropId)))}</td>
+      <td>${esc(fertName(f.fertilizerMasterId))}</td>
+      <td>${esc(f.quantity)} ${esc(f.unit)}</td>
+      <td>${pill(s)}${f.actualDate ? `<div class="muted small">Done ${fmtDate(f.actualDate)}</div>` : ''}</td>
+      <td class="r"><div class="acts">
+        ${open ? `<button class="btn btn-sm" data-act="fert-status" data-id="${f.id}" data-status="Done">Mark done</button>
+                  <button class="btn-ghost btn-sm" data-act="fert-status" data-id="${f.id}" data-status="Skipped">Skip</button>` : ''}
+        <button class="btn-ghost btn-sm" data-act="edit" data-coll="fertilizers" data-id="${f.id}">Edit</button>
+        <button class="btn-danger btn-sm" data-act="del" data-coll="fertilizers" data-id="${f.id}">Delete</button>
+      </div></td></tr>`;
+  }).join('');
+  return `<div class="notice">Quantities are entered by you, from your soil test report or an agricultural officer. SAMS does not recommend what or how much to apply.</div>` +
+    pageTools('', addBtn('fertilizers','Add schedule')) +
+    tableHtml(['Planned date','Crop','Fertilizer','Quantity','Status','Actions'], rows, 'No fertilizer tasks yet.');
+}
+
+function vHarvests(){
+  const list = [...mine('harvests')].sort((a,b) => b.harvestDate.localeCompare(a.harvestDate));
+  const rows = list.map(h => `<tr>
+    <td>${fmtDate(h.harvestDate)}</td><td>${esc(cropLabel(findCrop(h.cropId)))}</td>
+    <td>${esc(h.quantity)} ${esc(h.unit)}</td><td>${esc(h.quantitySold)} ${esc(h.unit)}</td>
+    <td class="r">${fmt(h.ratePerUnit)}</td><td class="r"><strong>${fmt(harvestRevenue(h))}</strong></td>
+    <td>${esc(h.buyer || '—')}</td><td class="r">${rowActs('harvests', h.id)}</td></tr>`).join('');
+  return pageTools('', addBtn('harvests','Add harvest')) +
+    tableHtml(['Date','Crop','Harvested','Sold','Rate','Revenue','Buyer',''], rows, 'No harvests recorded yet.');
+}
+
+function vReports(){
+  const crops = mine('crops');
+  if (!crops.length) return `<div class="panel">Add a farm and a crop first to see reports.</div>`;
+  if (!F.rep || !crops.some(c => c.id === F.rep)) F.rep = crops[0].id;
+  const c = crops.find(x => x.id === F.rep);
+  const s = cropSummary(c);
+  const expList = mine('expenses').filter(e => e.cropId === c.id);
+  const byCat = EXPENSE_CATS.map(cat => [cat, sum(expList.filter(e => e.category === cat), e => Number(e.amount))]).filter(x => x[1] > 0);
+  const maxCat = Math.max(1, ...byCat.map(x => x[1]));
+  const months = {};
+  mine('expenses').forEach(e => { const k = e.date.slice(0,7); months[k] = (months[k]||0) + Number(e.amount); });
+  const keys = Object.keys(months).sort().reverse();
+  const maxM = Math.max(1, ...Object.values(months));
+  const monthRows = keys.map(k => `<tr><td>${monthLabel(k)}</td><td class="r">${fmt(months[k])}</td>
+    <td><div class="bar"><span style="width:${(months[k]/maxM*100).toFixed(1)}%"></span></div></td></tr>`).join('');
+  const select = `<select data-filter="rep" aria-label="Choose crop" style="min-width:260px">
+    ${crops.map(x => `<option value="${x.id}"${x.id===c.id?' selected':''}>${esc(cropLabel(x))}</option>`).join('')}</select>`;
+  return pageTools(select, `<span class="muted small">${esc(farmName(c.farmId))} · ${esc(c.areaAcres)} acre(s) · ${esc(c.status)}</span>`) + `
+    <div class="stats">
+      ${statCard('Total cost', fmt(s.cost))}
+      ${statCard('Total revenue', fmt(s.revenue))}
+      ${statCard(s.profit>=0 ? 'Estimated profit' : 'Estimated loss', fmt(s.profit), s.profit>=0?'pos':'neg')}
+      ${statCard('Cost per acre', fmt(s.costPerAcre))}
+      ${statCard('Yield per acre', `${Number(s.yieldPerAcre.toFixed(2))} qtl`)}
+    </div>
+    <div class="two">
+      <section class="panel"><div class="panel-head"><h3>Cost by category</h3></div>
+        ${byCat.length ? byCat.map(([k,v]) => `<div class="cat-row"><div class="top"><span>${k}</span><strong>${fmt(v)}</strong></div>
+            <div class="bar"><span style="width:${(v/maxCat*100).toFixed(1)}%"></span></div></div>`).join('')
+          : '<p class="muted small">No expenses recorded for this crop.</p>'}
+        <p class="formula">Total cost = sum of expenses. Revenue = quantity sold × rate. Profit = revenue − cost.
+          Cost per acre = cost ÷ area. Yield per acre = harvest ÷ area.</p>
+      </section>
+      <section class="panel"><div class="panel-head"><h3>Monthly expenses (all crops)</h3></div>
+        ${tableHtml(['Month','Expenses','Share of peak'], monthRows, 'No expenses recorded yet.')}
+      </section>
+    </div>`;
+}
+
+function vAdmin(){
+  const farmers = db.users.filter(u => u.role === 'farmer');
+  const summary = `<div class="stats">
+    ${statCard('Farmer accounts', farmers.length)}
+    ${statCard('Active farmers', farmers.filter(u => u.isActive).length)}
+    ${statCard('Crops in master list', db.cropMaster.length)}
+    ${statCard('Fertilizers in master list', db.fertMaster.length)}</div>`;
+  const subTabs = [['crops','Crop master'],['fert','Fertilizer master'],['users','Users']];
+  const seg = `<div class="seg" role="tablist">${subTabs.map(([k,l]) =>
+    `<button class="${F.admTab===k?'on':''}" data-act="admin-tab" data-tab="${k}">${l}</button>`).join('')}</div>`;
+  let body;
+  if (F.admTab === 'users'){
+    const rows = db.users.map(u => `<tr>
+      <td>${esc(u.name)}</td><td>${esc(u.email)}</td><td>${esc(u.mobile||'—')}</td><td>${esc(u.role)}</td>
+      <td>${pill(u.isActive ? 'Active' : 'Inactive')}</td>
+      <td class="r">${u.role==='admin' ? '' : `<button class="btn-ghost btn-sm" data-act="toggle" data-coll="users" data-id="${u.id}">${u.isActive?'Deactivate':'Activate'}</button>`}</td></tr>`).join('');
+    body = tableHtml(['Name','Email','Mobile','Role','Status',''], rows, 'No users.');
+  } else {
+    const coll = F.admTab === 'crops' ? 'cropMaster' : 'fertMaster';
+    const field = coll === 'cropMaster' ? 'category' : 'type';
+    const rows = db[coll].map(m => `<tr>
+      <td><strong>${esc(m.name)}</strong></td><td>${esc(m[field])}</td><td>${pill(m.isActive?'Active':'Inactive')}</td>
+      <td class="r"><div class="acts">
+        <button class="btn-ghost btn-sm" data-act="edit" data-coll="${coll}" data-id="${m.id}">Edit</button>
+        <button class="btn-ghost btn-sm" data-act="toggle" data-coll="${coll}" data-id="${m.id}">${m.isActive?'Deactivate':'Activate'}</button>
+      </div></td></tr>`).join('');
+    body = pageTools('', addBtn(coll, coll==='cropMaster' ? 'Add crop' : 'Add fertilizer')) +
+      tableHtml(['Name', coll==='cropMaster'?'Category':'Type', 'Status',''], rows, 'The list is empty.');
+  }
+  return summary + seg + body +
+    `<div class="page-tools" style="margin-top:22px"><span class="muted small">Demo data is stored only in this browser.</span>
+     <button class="btn-danger btn-sm" data-act="reset">Reset demo data</button></div>`;
+}
+
+/* ---------- auth ---------- */
+let authMode = 'login';
+function openAuth(mode){
+  authMode = mode || 'login';
+  renderAuth();
+  $('#authModal').hidden = false;
+  const first = $('#authBody input');
+  if (first) first.focus();
+}
+
+function renderAuth(){
+  const isLogin = authMode === 'login';
+  $('#authTitle').textContent = isLogin ? 'Sign in to SAMS' : 'Create your account';
+  document.querySelectorAll('#authSeg button').forEach(b => b.classList.toggle('on', b.dataset.mode === authMode));
+  const loginHtml = `
+    <form data-form="login" novalidate>
+      <label class="field"><span>Email</span><input type="email" name="email" required autocomplete="email"></label>
+      <label class="field"><span>Password</span><input type="password" name="password" required autocomplete="current-password"></label>
+      <p class="err" data-err></p>
+      <button class="btn btn-block" type="submit">Sign in</button>
+    </form>
+    <div class="demo-box">
+      <div><strong>Demo farmer</strong><br>farmer@demo.com / demo1234 <button class="linkbtn" data-act="demo" data-email="farmer@demo.com" data-pw="demo1234">Use</button></div>
+      <div><strong>Demo administrator</strong><br>admin@sams.local / admin123 <button class="linkbtn" data-act="demo" data-email="admin@sams.local" data-pw="admin123">Use</button></div>
+    </div>`;
+  const registerHtml = `
+    <form data-form="register" novalidate>
+      <label class="field"><span>Full name</span><input name="name" required maxlength="100" autocomplete="name"></label>
+      <label class="field"><span>Email</span><input type="email" name="email" required autocomplete="email"></label>
+      <label class="field"><span>Mobile (optional)</span><input name="mobile" inputmode="numeric" maxlength="10" autocomplete="tel"><span class="hint">10 digits</span></label>
+      <label class="field"><span>Password</span><input type="password" name="password" required minlength="8" autocomplete="new-password"><span class="hint">At least 8 characters</span></label>
+      <label class="field"><span>Confirm password</span><input type="password" name="confirm" required minlength="8" autocomplete="new-password"></label>
+      <p class="err" data-err></p>
+      <button class="btn btn-block" type="submit">Create account</button>
+    </form>`;
+  $('#authBody').innerHTML = isLogin ? loginHtml : registerHtml;
+}
+
+function authError(form, msg){ const el = form.querySelector('[data-err]'); if (el) el.textContent = msg; }
+
+function doLogin(form){
+  const email = form.elements.email.value.trim().toLowerCase();
+  const pw = form.elements.password.value;
+  const u = db.users.find(x => x.email === email && x.password === pw);
+  if (!u) return authError(form, 'Incorrect email or password.');
+  if (!u.isActive) return authError(form, 'This account is inactive. Please contact the administrator.');
+  setSession(u.id);
+  closeModal('auth');
+  F.admTab = 'crops'; tab = u.role === 'admin' ? 'admin' : 'dashboard';
+  render();
+  toast(`Welcome, ${u.name}.`);
+}
+
+function doRegister(form){
+  const name = form.elements.name.value.trim();
+  const email = form.elements.email.value.trim().toLowerCase();
+  const mobile = form.elements.mobile.value.trim();
+  const pw = form.elements.password.value;
+  const pw2 = form.elements.confirm.value;
+  const err =
+    !/^[A-Za-z][A-Za-z .-]{1,99}$/.test(name) ? 'Name must be 2 to 100 characters: letters, spaces, dots and hyphens.' :
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? 'Enter a valid email address.' :
+    (mobile && !/^\d{10}$/.test(mobile)) ? 'Mobile number must be 10 digits.' :
+    pw.length < 8 ? 'Password must be at least 8 characters.' :
+    pw !== pw2 ? 'Passwords do not match.' :
+    db.users.some(u => u.email === email) ? 'An account with this email already exists.' : '';
+  if (err) return authError(form, err);
+  const u = {id: uid(), name, email, mobile, password: pw, role:'farmer', isActive:true};
+  db.users.push(u); save();
+  setSession(u.id);
+  closeModal('auth');
+  tab = 'dashboard';
+  render();
+  toast('Account created. Add your first farm to begin.');
+}
+
+/* ---------- shell ---------- */
+const F = {crop:'', cat:'', month:'', rep:'', admTab:'crops'};
+let tab = 'dashboard';
+
+const FARMER_TABS = [
+  ['dashboard','Dashboard','Overview of tasks and totals', vDashboard],
+  ['farms','Farms','Plots you farm', vFarms],
+  ['crops','Crops','Crops grown by season', vCrops],
+  ['expenses','Expenses','Money spent on each crop', vExpenses],
+  ['fertilizer','Fertilizer','Planned applications and their status', vFertilizer],
+  ['harvests','Harvests','Quantities harvested and sold', vHarvests],
+  ['reports','Reports','Cost, revenue and profit per crop', vReports]
+];
+const ADMIN_TABS = [['admin','Administration','Master lists and user accounts', vAdmin]];
+
+function tabsFor(u){ return u.role === 'admin' ? ADMIN_TABS : FARMER_TABS; }
+
+function render(){
+  const u = me();
+  $('#landing').hidden = !!u;
+  $('#workspace').hidden = !u;
+  $('#siteLinks').hidden = !!u;
+  $('#navRight').innerHTML = u
+    ? `<span class="who">${esc(u.name)}</span><button class="btn-ghost btn-sm" data-act="logout">Sign out</button>`
+    : `<button class="btn-ghost btn-sm" data-act="open-auth" data-mode="login">Sign in</button><button class="btn btn-sm" data-act="open-auth" data-mode="register">Create account</button>`;
+  if (!u) return;
+
+  const list = tabsFor(u);
+  if (!list.some(t => t[0] === tab)) tab = list[0][0];
+  const current = list.find(t => t[0] === tab);
+  $('#wsTitle').textContent = current[1];
+  $('#wsSub').textContent = current[2];
+  $('#wsDate').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  $('#wsTabs').innerHTML = list.map(([k,l]) =>
+    `<button class="tab ${k===tab?'on':''}" data-act="tab" data-tab="${k}" aria-current="${k===tab?'page':'false'}">${l}</button>`).join('');
+  $('#view').innerHTML = current[3]();
+}
+
+/* ---------- modals ---------- */
+function closeModal(which){
+  if (which === 'auth') $('#authModal').hidden = true;
+  else { $('#crudModal').hidden = true; crud = null; }
+  if (!which){ $('#authModal').hidden = true; $('#crudModal').hidden = true; crud = null; }
+}
+
+/* ---------- events ---------- */
+const ACTIONS = {
+  'open-auth'(el){ openAuth(el.dataset.mode); },
+  'auth-mode'(el){ authMode = el.dataset.mode; renderAuth(); },
+  'close-modal'(){ closeModal(); },
+  demo(el){
+    const f = document.querySelector('#authBody form[data-form="login"]');
+    if (f){ f.elements.email.value = el.dataset.email; f.elements.password.value = el.dataset.pw; f.elements.password.focus(); }
+  },
+  logout(){ setSession(null); tab = 'dashboard'; render(); toast('You have signed out.'); },
+  tab(el){ tab = el.dataset.tab; render(); window.scrollTo({top:0, behavior:'smooth'}); },
+  new(el){ openCrud(el.dataset.coll); },
+  edit(el){ openCrud(el.dataset.coll, el.dataset.id); },
+  del(el){ deleteRecord(el.dataset.coll, el.dataset.id); },
+  'fert-status'(el){ setFert(el.dataset.id, el.dataset.status); },
+  'admin-tab'(el){ F.admTab = el.dataset.tab; render(); },
+  toggle(el){ toggleActive(el.dataset.coll, el.dataset.id); },
+  reset(){
+    if (!confirm('Reset all demo data? Accounts and records saved in this browser will be replaced with the sample data.')) return;
+    setSession(null); db = seed(); save(); tab = 'dashboard'; render(); toast('Demo data has been reset.');
+  }
+};
+
+document.addEventListener('click', e => {
+  if (e.target.classList && e.target.classList.contains('modal-bg')){ closeModal(); return; }
+  const el = e.target.closest('[data-act]');
+  if (!el) return;
+  const fn = ACTIONS[el.dataset.act];
+  if (fn) fn(el);
+});
+
+document.addEventListener('submit', e => {
+  e.preventDefault();
+  const kind = e.target.dataset.form;
+  if (kind === 'login') doLogin(e.target);
+  else if (kind === 'register') doRegister(e.target);
+  else if (kind === 'crud') submitCrud(e.target);
+});
+
+document.addEventListener('change', e => {
+  const k = e.target.dataset.filter;
+  if (k){ F[k] = e.target.value; render(); }
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && (!$('#authModal').hidden || !$('#crudModal').hidden)) closeModal();
+});
+
+function toast(msg, bad){
+  const t = $('#toast');
+  t.textContent = msg;
+  t.className = 'show' + (bad ? ' bad' : '');
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => { t.className = ''; }, 2800);
+}
+
+render();
+</script>
+</body>
+</html>
